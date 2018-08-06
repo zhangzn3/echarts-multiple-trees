@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+    <script src="./echarts/echarts.js"></script>
+</head>
+
+<body>
+    <div id="main" style="width: 600px;height:500px;position:absolute;left:50%;top:50%; margin-left:-300px;margin-top:-250px;border:1px solid #ddd;box-shadow:0 5px 5px #eee"></div>
+</body>
+<script>
+    let myChart = echarts.init(document.getElementById('main'));
+    myChart.showLoading();
+    let rpsArr = [{
+        "title": "000001",
+        "name": "步骤一",
+        "children": [{
+            "name": "步骤二",
+            "children": [{
+                "name": "步骤三",
+                "children": [{
+                    "name": "步骤四",
+                    "children": [{
+                        "name": "步骤五",
+                        "children": [{
+                            "name": "步骤六"
+                        }]
+                    }]
+                }]
+            }, {
+                "name": "步骤三",
+                "children": [{
+                    "name": "步骤四",
+                    "children": [{
+                        "name": "步骤五",
+                        "children": [{
+                            "name": "步骤六"
+                        }]
+                    }]
+                }, {
+                    "name": "特殊步骤",
+                    "isSpecial": 1,
+                    "children": [{
+                        "name": "步骤四",
+                        "children": [{
+                            "name": "步骤五"
+                        }]
+                    }]
+                }]
+            }]
+        }]
+    }, {
+        "title": "000002",
+        "name": "步骤一2",
+        "children": [{
+            "name": "步骤二",
+            "children": [{
+                "name": "步骤三",
+                "children": [{
+                    "name": "步骤四",
+                    "children": [{
+                        "name": "步骤五",
+                        "children": [{
+                            "name": "步骤六"
+                        }]
+                    }]
+                }, {
+                    "name": "特殊步骤",
+                    "isSpecial": 1,
+                    "children": [{
+                        "name": "步骤四",
+                        "children": [{
+                            "name": "步骤五"
+                        }]
+                    }]
+                }]
+            }]
+        }]
+    }, {
+        "title": "000003",
+        "name": "步骤一3",
+        "children": [{
+            "name": "步骤二",
+            "children": [{
+                "name": "步骤三",
+                "children": [{
+                    "name": "步骤四",
+                    "children": [{
+                        "name": "步骤五",
+                        "children": [{
+                            "name": "步骤六"
+                        }]
+                    }]
+                }, {
+                    "name": "特殊步骤",
+                    "isSpecial": 1,
+                    "children": [{
+                        "name": "步骤四",
+                        "children": [{
+                            "name": "步骤五"
+                        }]
+                    }]
+                }]
+            }, {
+                "name": "步骤三",
+                "children": [{
+                    "name": "步骤四",
+                    "children": [{
+                        "name": "步骤五",
+                        "children": [{
+                            "name": "步骤六"
+                        }]
+                    }]
+                }]
+            }]
+        }]
+    }]
+    myChart.hideLoading();
+    if (rpsArr.length) {
+        let seriesConfig = [],
+            legendConfig = {
+                top: '2%',
+                left: '1%',
+                bottom: '0%',
+                orient: 'vertical',
+                data: [],
+                borderColor: '#c23531',
+                itemGap: myChart.getHeight() / rpsArr.length,
+                formatter: function(name) {
+                    return "标题文字：" + name
+                }
+            };
+        rpsArr.forEach(function(rpsArrItem, rpsArrIdx) {
+
+            function setSymbol(obj) {
+                obj["isSpecial"] == 1 && (obj["symbol"] = "emptyCircle");
+                if (obj["children"]) {
+                    obj["children"].forEach(function(sItem) {
+                        setSymbol(sItem);
+                    })
+                }
+            }
+            setSymbol(rpsArrItem);
+
+            let seriesConfigItem = {
+                name: rpsArrItem["title"],
+                type: 'tree',
+                data: [rpsArrItem],
+                top: (1 / rpsArr.length * 100 * rpsArrIdx == 0 ? 5 : 1 / rpsArr.length * 100 * rpsArrIdx) + "%",
+                bottom: 100 - 1 / rpsArr.length * 100 * (rpsArrIdx + 1) + "%",
+                left: '10%',
+                right: '7%',
+                symbol: 'circle',
+                symbolSize: 7,
+                itemStyle: {
+                    color: "#199ed8",
+                    borderColor: "#199ed8"
+                },
+                lineStyle: {
+                    curveness: 0.5
+                },
+                label: {
+                    normal: {
+                        position: 'top',
+                        verticalAlign: 'bottom',
+                        align: 'center',
+                        fontSize: 12
+                    }
+                },
+                leaves: {
+                    label: {
+                        normal: {
+                            position: 'top',
+                            verticalAlign: 'bottom',
+                            align: 'center'
+                        }
+                    }
+                },
+                tooltip: {
+                    formatter: function(params) {
+                        return params.name
+                    }
+                },
+                expandAndCollapse: false,
+                animationDuration: 550,
+                animationDurationUpdate: 750,
+                renderItem: function(params, api) {
+                    console.info(params, api)
+                }
+            }
+            seriesConfig.push(seriesConfigItem);
+            legendConfig["data"].push({
+                name: rpsArrItem["title"],
+                icon: "circle"
+            })
+        });
+        myChart.setOption(option = {
+            tooltip: {
+                trigger: 'item',
+                triggerOn: 'mousemove'
+            },
+            legend: legendConfig,
+            series: seriesConfig
+        });
+
+        console.info("myChart===>", myChart);
+    }
+</script>
+
+</html>
